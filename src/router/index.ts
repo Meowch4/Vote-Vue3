@@ -10,7 +10,12 @@ const router = createRouter({
       component: HomeView,
       children: [
         {
+          path: '/',
+          redirect: '/select-create',
+        },
+        {
           path: 'select-create',
+          // alias: '',
           component: SelectCreate,
         },
         {
@@ -18,6 +23,10 @@ const router = createRouter({
           component: () => import('../views/Me.vue'),
         },
       ],
+    },
+    {
+      path: '/login',
+      component: () => import('../views/Login.vue'),
     },
     {
       path: '/create',

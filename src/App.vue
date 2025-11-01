@@ -1,5 +1,10 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
+import { useVoteStore } from '@/stores/vote'
+
+var voteStore = useVoteStore()
+
+await voteStore.getUserInfo()
 </script>
 
 <template>
