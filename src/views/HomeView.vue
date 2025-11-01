@@ -1,9 +1,9 @@
 <template>
-  <main class="flex flex-col h-[100vh]">
+  <main class="flex flex-col h-[100vh] overflow-hidden">
     <div class="grow">
       <RouterView></RouterView>
     </div>
-    <div class="h-12 flex justify-center">
+    <div class="h-18 flex justify-center bg-white border-t">
       <RouterLink
         to="/select-create"
         class="text-black-500 [&.router-link-active]:text-green-500 basis-0 grow flex flex-col items-center"

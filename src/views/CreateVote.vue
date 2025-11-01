@@ -1,7 +1,7 @@
 <template>
   <div class="bg-gray-200 h-[100dvh] flex flex-col">
-    <div class="bg-white">
-      <h1 class="font-bold text-xl mt-2">
+    <div class="bg-white pt-2 space-y-1">
+      <h1 class="font-bold text-xl p-4">
         <RouterLink to="/">
           <el-icon class="relative top-px">
             <ArrowLeftBold></ArrowLeftBold>
@@ -14,22 +14,18 @@
         <input
           type="text"
           v-model="title"
-          class="border-b my-1 p-2 rounded outline-none focus:ring m-2 text-lg font-bold"
+          class="transition border-b my-1 p-2 rounded outline-none focus:ring m-2 text-xl font-bold"
           placeholder="投票标题"
         />
         <input
           type="text"
           v-model="desc"
-          class="border-b my-1 p-2 rounded outline-none focus:ring m-2"
+          class="transition border-b my-1 p-2 rounded outline-none focus:ring m-2"
           placeholder="补充描述（选填）"
         />
-        <div
-          v-for="(option, idx) of options"
-          @click="deleteOption(idx)"
-          :key="idx"
-          class="flex gap-2 items-center"
-        >
+        <div v-for="(option, idx) of options" :key="idx" class="flex gap-2 items-center">
           <span
+            @click="deleteOption(idx)"
             class="font-bold cursor-pointer shrink-0 w-5 h-5 ml-4 bg-red-500 rounded-full flex justify-center items-center text-white"
           >
             <el-icon :size="12">
@@ -39,24 +35,27 @@
           <input
             type="text"
             v-model="options[idx]"
-            class="w-full m-2 p-2 border-b outline-none focus:ring my-2"
+            class="transition w-full m-2 p-2 rounded border-b outline-none focus:ring my-2"
             placeholder="选项"
           />
         </div>
 
-        <div @click="addOption" class="flex gap-2 items-center">
+        <div class="flex gap-2 items-center">
           <span
+            @click="addOption"
             class="cursor-pointer shrink-0 w-5 h-5 ml-4 bg-sky-500 rounded-full flex justify-center items-center text-white"
           >
             <el-icon :size="12">
               <Plus></Plus>
             </el-icon>
           </span>
-          <input
+          <button
             type="text"
-            class="placeholder-sky-400 w-full m-2 p-2 outline-none focus:ring my-2"
-            placeholder="添加选项"
-          />
+            @click="addOption"
+            class="cursor-pointer text-sky-400 m-2 p-2 outline-none my-2"
+          >
+            添加选项
+          </button>
         </div>
       </div>
     </div>
@@ -77,11 +76,11 @@
       </div>
       <div class="hidden m-2 p-2 border-b flex justify-between">
         限制传播
-        <el-switch v-model="value1" />
+        <el-switch />
       </div>
     </div>
 
-    <button class="m-4 py-3 px-6 bg-sky-500 rounded text-white">完成</button>
+    <button @click="create" class="m-4 py-3 px-6 bg-sky-500 rounded text-white">完成</button>
   </div>
 </template>
 
@@ -89,7 +88,7 @@
 import { useVoteStore } from '@/stores/vote'
 import { Minus, Plus } from '@element-plus/icons-vue'
 import axios from 'axios'
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 var voteStore = useVoteStore()
@@ -97,15 +96,17 @@ var router = useRouter()
 var route = useRoute()
 var type = computed(() => (route.query.type == 'single' ? '单选' : '多选'))
 
-if (voteStore.user == null) {
-  router.replace('/login?next=' + route.fullPath)
-}
+onMounted(() => {
+  if (voteStore.user == null) {
+    router.replace('/login?next=' + route.fullPath)
+  }
+})
 
 var title = ref('')
 var desc = ref('')
 var deadline = ref(new Date(Date.now() + 86400000 * 3))
-var anonymous = ref('')
-var multiple = type.value == '多选'
+var anonymous = ref(false)
+var multiple = computed(() => type.value == '多选')
 var options = ref(['', ''])
 
 function addOption() {
@@ -114,7 +115,7 @@ function addOption() {
 function deleteOption(idx) {
   options.value.splice(idx, 1)
 }
-function create() {
+async function create() {
   var voteInfo = {
     title: title.value,
     desc: desc.value,
@@ -123,8 +124,15 @@ function create() {
     multiple: multiple.value,
     options: options.value,
   }
-  axios.post('/vote', voteInfo)
+  var res = await axios.post('/vote', voteInfo)
   console.log(res)
+  if (res.data.code == 0) {
+    var id = res.data.result.voteId
+    router.push('/vote/' + id)
+  } else {
+    voteStore.user = null
+    router.push('/login?next=' + route.fullPath)
+  }
 }
 </script>
 

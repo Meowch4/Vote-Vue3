@@ -3,7 +3,7 @@
     用户名：
     <input type="text" class="border" v-model="name" name="" />
     密码：
-    <input type="text" class="border" v-model="password" name="" />
+    <input type="password" class="border" v-model="password" name="" />
   </div>
   <button @click="login">登陆</button>
 </template>
