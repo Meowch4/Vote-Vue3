@@ -40,6 +40,10 @@ const router = createRouter({
       path: '/my-votes',
       component: () => import('../views/MyVotes.vue'),
     },
+    {
+      path: '/my-settings',
+      component: () => import('../views/MySettings.vue'),
+    },
   ],
 })
 
