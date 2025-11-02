@@ -25,3 +25,9 @@
 
   </div>
 </template>
+
+<script setup lang="ts">
+import { useLogin } from '../hooks'
+
+useLogin()
+</script>

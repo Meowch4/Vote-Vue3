@@ -85,22 +85,16 @@
 </template>
 
 <script setup>
+import { useLogin } from '@/hooks'
 import { useVoteStore } from '@/stores/vote'
 import { Minus, Plus } from '@element-plus/icons-vue'
 import axios from 'axios'
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-var voteStore = useVoteStore()
-var router = useRouter()
-var route = useRoute()
 var type = computed(() => (route.query.type == 'single' ? '单选' : '多选'))
 
-onMounted(() => {
-  if (voteStore.user == null) {
-    router.replace('/login?next=' + route.fullPath)
-  }
-})
+useLogin()
 
 var title = ref('')
 var desc = ref('')

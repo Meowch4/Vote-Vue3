@@ -39,24 +39,21 @@
 
 <script setup lang="ts">
 import axios from 'axios'
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
+import { useVoteStore } from '@/stores/vote'
+import { useRoute, useRouter } from 'vue-router'
+import { useLogin, useSelectOne } from '../hooks'
 
+var isLogin = useLogin()
+var myVotes = ref([])
+
+if (isLogin) {
 var res = await axios.get('/vote')
-var myVotes = reactive(res.data.result)
 
-function useSelectOne() {
-  var selectedIdx = ref(-1)
-
-  function setSelect(idx: number) {
-    if (selectedIdx.value == idx) {
-      selectedIdx.value = -1
-    } else {
-      selectedIdx.value = idx
-    }
-  }
-
-  return [selectedIdx, setSelect] as const // 如果不as const,则这个数组的类型会被推导为(xxx|yyy)[],解构出的第一项就是xxx|yyy
+  myVotes.value = res.data.result
 }
 
+
 var [selectedIdx, setIdx] = useSelectOne()
+
 </script>
