@@ -74,7 +74,7 @@
         匿名投票
         <el-switch v-model="anonymous" />
       </div>
-      <div class="hidden m-2 p-2 border-b flex justify-between">
+      <div class="hidden m-2 p-2 border-b justify-between">
         限制传播
         <el-switch />
       </div>

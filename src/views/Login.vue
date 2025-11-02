@@ -1,11 +1,23 @@
 <template>
-  <div>
-    用户名：
-    <input type="text" class="border" v-model="name" name="" />
-    密码：
-    <input type="password" class="border" v-model="password" name="" />
+    <h1 class="p-4 text-xl border-b">
+    <RouterLink to="/">
+      <el-icon class="relative top-px">
+        <ArrowLeftBold></ArrowLeftBold>
+      </el-icon>
+    </RouterLink>
+    返回
+  </h1>
+  <div class="flex justify-center flex-col">
+    <input 
+    type="text" 
+    placeholder="用户名"
+    class="p-4 m-4 text-lg outline-none focus:ring rounded border" v-model="name" name="" />
+    <input 
+    type="password" 
+    placeholder="密码"
+    class="p-4 m-4 text-lg outline-none focus:ring rounded border" v-model="password" name="" />
   </div>
-  <button @click="login">登陆</button>
+  <button class="mx-auto rounded p-4 block w-2/3 border border-blue-500 text-lg " @click="login">登陆</button>
 </template>
 
 <script setup lang="ts">
@@ -31,7 +43,6 @@ async function login() {
     })
 
     voteStore.user = user.data.result
-    debugger
     router.replace(next)
   } catch (e) {
     alert('登录失败')

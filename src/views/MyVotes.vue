@@ -8,7 +8,7 @@
     我的投票
   </h1>
 
-  <div class="divide-y w-full">
+  <div class="divide-y mb-16">
     <div class="" v-for="(vote, idx) of myVotes" :key="vote.id">
       <div
         @click="setIdx(idx)"
@@ -48,7 +48,7 @@ var isLogin = useLogin()
 var myVotes = ref([])
 
 if (isLogin) {
-var res = await axios.get('/vote')
+  var res = await axios.get('/vote')
 
   myVotes.value = res.data.result
 }
