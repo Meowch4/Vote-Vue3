@@ -9,7 +9,7 @@
   </h1>
 
   <div class="divide-y mb-16">
-    <div class="" v-for="(vote, idx) of myVotes" :key="vote.id">
+    <div class="" v-for="(vote, idx) of myVotes" :key="vote.voteId">
       <div
         @click="setIdx(idx)"
         class="px-4 hover:bg-green-100 flex items-center justify-between h-16"
@@ -40,17 +40,27 @@
 <script setup lang="ts">
 import axios from 'axios'
 import { ref, reactive, onMounted } from 'vue'
-import { useVoteStore } from '@/stores/vote'
-import { useRoute, useRouter } from 'vue-router'
 import { useLogin, useSelectOne } from '../hooks'
 
+type VoteInfo = {
+  voteId: number,
+  userId: number,
+  title: string, 
+  desc: string,
+  deadline: string,
+  anonymous: number | boolean,
+  multiple: number | boolean
+}
+
 var isLogin = useLogin()
-var myVotes = ref([])
+var myVotes = ref<VoteInfo[]>([])
 
-if (isLogin) {
-  var res = await axios.get('/vote')
-
-  myVotes.value = res.data.result
+try {
+  var res = await axios.get('/vote') // 如果没登陆，可能请求失败
+  myVotes.value = res.data.result as VoteInfo[]
+} catch (e) {
+  myVotes.value = []
+  useLogin()
 }
 
 
