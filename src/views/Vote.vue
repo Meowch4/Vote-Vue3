@@ -1,6 +1,6 @@
 <template>
   <div class="bg-gray-100 flex flex-col h-[100vh]">
-    <h1 class="py-2 text-xl">
+    <h1 class="py-4 p-4 text-xl">
       <RouterLink to="/">
         <el-icon><House /></el-icon>
       </RouterLink>
@@ -30,11 +30,17 @@
       >
       <div class="relative flex items-center h-16">
           {{ option.content }}
-          <span class="pl-2">{{ optionChecked[option.optionId] ? '✔️' : '' }}</span>
+
+          <span v-if="isVoting && option.optionId == lastVotedIndex"
+          class="flex items-center pl-2 animate-spin">
+            <el-icon><Loading /></el-icon>
+          </span>
+          <span v-else class="pl-2">{{ optionChecked[option.optionId] ? '✔️' : '' }}</span>
+
           <span class="ml-auto mr-2">{{ optionVotes[option.optionId].length }} 票</span>
           <span class="w-14 text-right">{{ optionPercentage[option.optionId] }}</span>
           <div 
-          class="absolute bottom-0 bg-sky-500 h-[2px]"
+          class="transition-all absolute bottom-0 bg-sky-500 h-[2px]"
           :style="{width: optionPercentage[option.optionId]}"
           ></div>
         </div>
@@ -144,13 +150,20 @@ var optionChecked = computed(() => {
   return isVotedByCurrentUser.value
 })
 
+var isVoting = ref(false) // 是否正在发送请求，用来显示loading
+var lastVotedIndex = ref(-1) // 最后一次投票的id，用来显示loading
+
 function handleOptionClick(optionId: number) {
   // 非匿名，点击即发起请求
   if (!voteInfo.vote.anonymous) {
+    isVoting.value = true
+    lastVotedIndex.value = optionId
+
     axios.post(`/vote/${voteInfo.vote.voteId}`, {
       optionIds: [optionId]
     }).then(res => {
       // console.log(res.data.result)
+      isVoting.value = false
       voteInfo.userVotes = res.data.result.userVotes
     })
   } else {
