@@ -63,7 +63,7 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
 import axios from 'axios'
-import { computed, reactive, ref, watchEffect } from 'vue'
+import { computed, onMounted, reactive, ref, watchEffect } from 'vue'
 import { useVoteStore } from '@/stores/vote'
 
 var route = useRoute()
@@ -194,6 +194,14 @@ function submit() {
     voteInfo.userVotes = res.data.result.userVotes
   })
 }
+
+onMounted(() => {
+  var ws = new WebSocket(`ws://${location.host}/realtime-voteinfo/${id}`)
+  ws.onmessage = e => {
+    var userVotes = JSON.parse(e.data)
+    voteInfo.userVotes = userVotes
+  }
+})
 
 
 </script>
