@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import { useVoteStore } from './stores/vote'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -29,4 +29,31 @@ export function useLogin() {
   }
 
   return true
+}
+
+var sizeRef:any = ref({
+  width: window.innerWidth,
+  height: window.innerHeight,
+})
+
+var listened = false
+
+function resize(){
+  sizeRef.value.width = window.innerWidth
+  sizeRef.value.height = window.innerHeight
+}
+
+export function useWindowSize() {
+  if (!listened) {
+    onMounted(() => {
+      listened = true
+      window.addEventListener('resize', resize)
+    })
+    onUnmounted(() => {
+      listened = false
+      window.removeEventListener('resize', resize)
+    })
+  }
+
+  return sizeRef
 }

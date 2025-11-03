@@ -23,40 +23,62 @@
 
     <ul class="space-y-3">
       <li
-        class="px-4 hover:bg-blue-300 cursor-pointer  bg-white shadow h-16"
+        class=""
         v-for="(option, idx) in voteInfo.options"
         :key="idx"
-        @click="handleOptionClick(option.optionId)"
       >
-      <div class="relative flex items-center h-16">
-          {{ option.content }}
+        <div 
+        class="bg-white shadow px-4 hover:bg-blue-300 cursor-pointer"
+        @click="handleOptionClick(option.optionId)"
+        >
+          <div class="relative flex items-center h-16">
+            {{ option.content }}
 
-          <span v-if="isVoting && option.optionId == lastVotedIndex"
-          class="flex items-center pl-2 animate-spin">
-            <el-icon><Loading /></el-icon>
-          </span>
-          <span v-else class="pl-2">{{ optionChecked[option.optionId] ? '✔️' : '' }}</span>
+            <span
+              v-if="isVoting && option.optionId == lastVotedIndex"
+              class="flex items-center align-center pl-2 animate-spin"
+            >
+              <el-icon><Loading /></el-icon>
+            </span>
+            <span v-else class="pl-2">{{ optionChecked[option.optionId] ? '✔️' : '' }}</span>
 
-          <span class="ml-auto mr-2">{{ optionVotes[option.optionId].length }} 票</span>
-          <span class="w-14 text-right">{{ optionPercentage[option.optionId] }}</span>
-          <div 
-          class="transition-all absolute bottom-0 bg-sky-500 h-[2px]"
-          :style="{width: optionPercentage[option.optionId]}"
-          ></div>
+            <span class="ml-auto mr-2">{{ optionVotes[option.optionId].length }} 票</span>
+            <span class="w-14 text-right">{{ optionPercentage[option.optionId] }}</span>
+            <div
+              class="transition-all absolute bottom-0 bg-sky-500 h-[2px]"
+              :style="{ width: optionPercentage[option.optionId] }"
+            ></div>
+          </div>
+        </div>
+        <div 
+        v-if="!voteInfo.vote.anonymous"
+        ref="avatarContainer"
+        class="flex flex-wrap gap-2 px-4 pt-2 mt-2">
+          <img
+            class="inline-block align-top w-8 h-8 rounded-full border border-slate-500"
+            v-for="user in visibleAvatars(idx)"
+            :src="user.avatar"
+            alt=""
+          />
+          <el-icon 
+          class="cursor-pointer inline-block align-top !w-8 !h-8 rounded-full border border-slate-500"
+          @click="eachOptionAvatarDisplay[idx]=true"
+          ><More /></el-icon>
         </div>
       </li>
     </ul>
-    <div class="flex justify-between items-center mx-4 h-12 text-base">
-      <span class="">{{ voteInfo.vote.deadline }}</span>
-      <span> 吐个槽 | 举报投票 </span>
+    <div class="flex justify-between items-center m-4 h-12 text-base">
+      <span class="text-slate-500">投票截止:{{ voteInfo.vote.deadline }}</span>
+      <span class="text-slate-500"> 吐个槽 | 举报投票 </span>
     </div>
-    <button 
-    @click="submit"
-    v-if="showCompleteButton"
-    :disabled="selectedOptionId.length == 0"
-    class="disabled:bg-gray-500 bg-blue-500 text-white rounded m-4 p-2 flex justify-center text-lg"
+    <button
+      @click="submit"
+      v-if="showCompleteButton"
+      :disabled="selectedOptionId.length == 0"
+      class="disabled:bg-gray-500 bg-blue-500 text-white rounded m-4 p-2 flex justify-center text-lg"
     >
-    完成</button>
+      完成
+    </button>
   </div>
 </template>
 
@@ -65,6 +87,8 @@ import { useRoute } from 'vue-router'
 import axios from 'axios'
 import { computed, onMounted, reactive, ref, watchEffect } from 'vue'
 import { useVoteStore } from '@/stores/vote'
+import { useWindowSize } from '@/hooks'
+import { useElementSize } from '@vueuse/core'
 
 var route = useRoute()
 var id = route.params.id
@@ -77,11 +101,13 @@ var displayType = computed(() => (voteInfo.vote.multiple ? '[多选]' : '[单选
 
 // 形如{选项1: [用户1，用户2]， 选项2:[用户2， 用户3]}
 var optionVotes = computed(() => {
-  var eachVoteCountOfOption:any = {}
-  
+  var eachVoteCountOfOption: any = {}
+
   for (var option of voteInfo.options) {
     // vote是一张票，其voteID代表它是投给哪个选项的
-    eachVoteCountOfOption[option.optionId] = voteInfo.userVotes.filter((vote: any) => vote.optionId == option.optionId)
+    eachVoteCountOfOption[option.optionId] = voteInfo.userVotes.filter(
+      (vote: any) => vote.optionId == option.optionId,
+    )
   }
   return eachVoteCountOfOption
 })
@@ -94,9 +120,10 @@ var optionPercentage = computed(() => {
 
   for (let optionId in optionVotes.value) {
     var thisOptionVoteCount = optionVotes.value[optionId]
-    eachOptionPercentage[optionId] = 
-    thisOptionVoteCount.length > 0 ?
-    (thisOptionVoteCount.length / totalUsers * 100).toFixed(1) + '%' : 0 + '%'
+    eachOptionPercentage[optionId] =
+      thisOptionVoteCount.length > 0
+        ? ((thisOptionVoteCount.length / totalUsers) * 100).toFixed(1) + '%'
+        : 0 + '%'
   }
   return eachOptionPercentage
 })
@@ -118,15 +145,21 @@ var isVotedByCurrentUser = computed(() => {
 // 实名，直接点击即可投票
 // 匿名，需要选择选项后再点击完成按钮
 var showCompleteButton = computed(() => {
+  // 实名投票不显示完成按钮（点击即可切换选项）
   if (!voteInfo.vote.anonymous) {
     return false
-  } 
+  }
+  // 过期不显示完成按钮
   var d = new Date().toISOString()
   if (d > voteInfo.vote.deadline) {
     return false
   }
-  // 匿名投票                     用户在任意一个投票上投过票
-  if (voteInfo.vote.anonymous && Object.values(isVotedByCurrentUser.value).some((it:any) => it == true)) {
+  // 匿名投票
+  // 且用户在任意一个投票上投过票 不显示完成按钮
+  if (
+    voteInfo.vote.anonymous &&
+    Object.values(isVotedByCurrentUser.value).some((it: any) => it == true)
+  ) {
     return false
   }
   return true
@@ -135,12 +168,12 @@ var showCompleteButton = computed(() => {
 var selectedOptionId = ref<number[]>([])
 
 // 返回对象，因为对勾的表达式是
-// isVotedByCurrentUser[option.optionId] ? '✔️' : '' 
+// isVotedByCurrentUser[option.optionId] ? '✔️' : ''
 var optionChecked = computed(() => {
   // 在未投票的时候选中哪个选项哪个选项打勾
   // 需要把selectedOptionId（数组）转换成对象
   if (showCompleteButton.value) {
-    let result:any = {}
+    let result: any = {}
     for (let optionId of selectedOptionId.value) {
       result[optionId] = true
     }
@@ -150,22 +183,62 @@ var optionChecked = computed(() => {
   return isVotedByCurrentUser.value
 })
 
+// 使用了VueUse
+// 计算的是元素尺寸，所以pc端也没问题
+var avatarContainer = ref(null)
+// 上面这个ref可能传给了多个元素所以可能是数组
+// 只要ref用在v-for里的就都是数组，不管长度多少
+var firstAvatarContainer = computed(() => {
+  return avatarContainer.value?.[0] 
+})
+var { width } = useElementSize(firstAvatarContainer)
+var avatarCount2 = computed(() => {
+  return Math.floor(((width.value) + 8) / 40)
+})
+
+// 根据窗口宽度计算可以显示的头像个数
+// 在pc浏览器上可能会有问题，因为pc浏览器有滚动条
+var size = useWindowSize()
+var avatarCount = computed(() => {
+  return Math.floor(((size.value.width - 32) + 8) / 40)
+})
+
+// 创建与选项数量等长的填满false的数组
+var eachOptionAvatarDisplay = ref<boolean[]>(new Array(voteInfo.options.length).fill(false))
+
+function visibleAvatars(optionIdx: number) {
+  // 解构出当前选项的optionId
+  let {optionId} = voteInfo.options[optionIdx]
+  // 如果当前选项头像展开为true
+  if (eachOptionAvatarDisplay.value[optionIdx]) {
+    return optionVotes.value[optionId]
+  } else {
+    // 如果没展开就要slice
+    return optionVotes.value[optionId].slice(0, avatarCount2.value - 1)
+  }
+}
+
+
 var isVoting = ref(false) // 是否正在发送请求，用来显示loading
 var lastVotedIndex = ref(-1) // 最后一次投票的id，用来显示loading
 
 function handleOptionClick(optionId: number) {
   // 非匿名，点击即发起请求
   if (!voteInfo.vote.anonymous) {
-    isVoting.value = true
-    lastVotedIndex.value = optionId
-
-    axios.post(`/vote/${voteInfo.vote.voteId}`, {
-      optionIds: [optionId]
-    }).then(res => {
-      // console.log(res.data.result)
-      isVoting.value = false
-      voteInfo.userVotes = res.data.result.userVotes
-    })
+    if (showCompleteButton.value) {
+      isVoting.value = true
+      lastVotedIndex.value = optionId
+  
+      axios
+        .post(`/vote/${voteInfo.vote.voteId}`, {
+          optionIds: [optionId],
+        })
+        .then((res) => {
+          // console.log(res.data.result)
+          isVoting.value = false
+          voteInfo.userVotes = res.data.result.userVotes
+        })
+    }
   } else {
     if (showCompleteButton.value) {
       // 匿名投票点击只是选中该选项，点提交才发送请求，且不能再发送了
@@ -187,21 +260,21 @@ function handleOptionClick(optionId: number) {
 }
 
 function submit() {
-  axios.post(`/vote/${voteInfo.vote.voteId}`, {
-    optionIds: selectedOptionId.value
-  }).then(res => {
-    // console.log(res.data.result)
-    voteInfo.userVotes = res.data.result.userVotes
-  })
+  axios
+    .post(`/vote/${voteInfo.vote.voteId}`, {
+      optionIds: selectedOptionId.value,
+    })
+    .then((res) => {
+      // console.log(res.data.result)
+      voteInfo.userVotes = res.data.result.userVotes
+    })
 }
 
 onMounted(() => {
   var ws = new WebSocket(`ws://${location.host}/realtime-voteinfo/${id}`)
-  ws.onmessage = e => {
+  ws.onmessage = (e) => {
     var userVotes = JSON.parse(e.data)
     voteInfo.userVotes = userVotes
   }
 })
-
-
 </script>
