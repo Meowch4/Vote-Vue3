@@ -92,6 +92,8 @@ import axios from 'axios'
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+var router = useRouter()
+var route = useRoute()
 var type = computed(() => (route.query.type == 'single' ? '单选' : '多选'))
 
 useLogin()
