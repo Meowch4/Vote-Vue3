@@ -28,8 +28,12 @@
         :key="idx"
       >
         <div 
-        class="bg-white shadow px-4 hover:bg-blue-300 cursor-pointer"
-        @click="handleOptionClick(option.optionId)"
+        class="bg-white shadow px-4 "
+        :class="{
+          'hover:bg-blue-300 cursor-pointer': !pastDeadline,
+          'cursor-default opacity-70': pastDeadline
+        }"
+        @click="!pastDeadline && handleOptionClick(option.optionId)"
         >
           <div class="relative flex items-center h-16">
             {{ option.content }}
@@ -51,7 +55,7 @@
           </div>
         </div>
         <div 
-        v-if="!voteInfo.vote.anonymous"
+        v-if="!voteInfo.vote.anonymous && visibleAvatars(idx).length > 0"
         ref="avatarContainer"
         class="flex flex-wrap gap-2 px-4 pt-2 mt-2">
           <img
@@ -68,7 +72,7 @@
       </li>
     </ul>
     <div class="flex justify-between items-center m-4 h-12 text-base">
-      <span class="text-slate-500">投票截止:{{ voteInfo.vote.deadline }}</span>
+      <span class="text-slate-500">投票截止:{{ localDate }}</span>
       <span class="text-slate-500"> 吐个槽 | 举报投票 </span>
     </div>
     <button
@@ -96,6 +100,9 @@ var voteStore = useVoteStore()
 
 var res = await axios.get('/vote/' + id)
 var voteInfo = reactive(res.data.result)
+
+var iso = voteInfo.vote.deadline
+const localDate = new Date(iso).toLocaleString()
 
 var displayType = computed(() => (voteInfo.vote.multiple ? '[多选]' : '[单选]'))
 
@@ -142,6 +149,14 @@ var isVotedByCurrentUser = computed(() => {
   return result
 })
 
+var pastDeadline = computed(() => {
+  var d = new Date().toISOString()
+  if (d > voteInfo.vote.deadline) {
+    return true
+  }
+  return false
+})
+
 // 实名，直接点击即可投票
 // 匿名，需要选择选项后再点击完成按钮
 var showCompleteButton = computed(() => {
@@ -150,8 +165,7 @@ var showCompleteButton = computed(() => {
     return false
   }
   // 过期不显示完成按钮
-  var d = new Date().toISOString()
-  if (d > voteInfo.vote.deadline) {
+  if (pastDeadline) {
     return false
   }
   // 匿名投票
