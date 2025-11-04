@@ -63,12 +63,31 @@
     <div class="bg-white mt-4 px-4">
       <div class="m-2 p-2 pt-3 border-b flex justify-between">
         截止日期
-        <el-date-picker
+        <div @click="showPicker = true">{{ deadDate.join('-') }} {{ deadTime.join(':') }}</div>
+        <Popup 
+        v-model:show="showPicker"
+        position="bottom"
+        >
+          <PickerGroup
+            title="截止时间"
+            :tabs="['选择日期', '选择时间']"
+            @confirm="showPicker = false"
+            @cancel="showPicker = false"
+          >
+            <DatePicker
+              v-model="deadDate"
+            />
+            <TimePicker 
+            v-model="deadTime" 
+            />
+          </PickerGroup>
+        </Popup>
+        <!-- <el-date-picker
           format="YYYY-MM-DD HH:mm"
           v-model="deadline"
           type="datetime"
           placeholder="请选择截止日期和时间"
-        />
+        /> -->
       </div>
       <div class="m-2 p-2 flex justify-between">
         匿名投票
@@ -91,6 +110,7 @@ import { Minus, Plus } from '@element-plus/icons-vue'
 import axios from 'axios'
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { Popup, DatePicker, PickerGroup, TimePicker } from 'vant'
 
 var router = useRouter()
 var route = useRoute()
@@ -100,7 +120,9 @@ useLogin()
 
 var title = ref('')
 var desc = ref('')
-var deadline = ref(new Date(Date.now() + 86400000 * 3))
+var deadDate = ref(['2025', '11', '11'])
+var deadTime = ref(['00', '00'])
+var deadline = computed(() => new Date(deadDate.value.join('-') + ' ' + deadTime.value.join(':')))
 var anonymous = ref(false)
 var multiple = computed(() => type.value == '多选')
 var options = ref(['', ''])
@@ -130,6 +152,8 @@ async function create() {
     router.push('/login?next=' + route.fullPath)
   }
 }
+
+var showPicker = ref(false)
 </script>
 
 <!-- POST /vote
