@@ -25,10 +25,12 @@
           ><span>📚</span>查看</RouterLink
         >
         <span
+          @click="shareVote(vote.voteId)"
           class="hover:bg-green-100 py-2 h-16 cursor-pointer flex flex-col basis-0 grow items-center justify-center border"
           ><span>📚</span>分享</span
         >
         <span
+        @click="deleteVote(vote.voteId)"
           class="hover:bg-green-100 py-2 h-16 cursor-pointer flex flex-col basis-0 grow items-center justify-center border"
           ><span>📚</span>删除</span
         >
@@ -41,6 +43,7 @@
 import axios from 'axios'
 import { ref, reactive, onMounted } from 'vue'
 import { useLogin, useSelectOne } from '../hooks'
+import { ElMessage, ElMessageBox } from 'element-plus'
 
 type VoteInfo = {
   voteId: number,
@@ -63,7 +66,54 @@ try {
   useLogin()
 }
 
-
 var [selectedIdx, setIdx] = useSelectOne()
+
+async function deleteVote(voteId: number) {
+
+  ElMessageBox.confirm(
+    '确定要删除这个投票吗？',
+    '',
+    {
+      confirmButtonText: '确认',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  )
+    .then(async () => {
+      await axios.delete('/vote/' + voteId)
+      myVotes.value = myVotes.value.filter(it => it.voteId != voteId)
+      setIdx(-1)
+      ElMessage({
+        type: 'success',
+        message: '删除成功！',
+      })
+    })
+    .catch(() => {
+      ElMessage({
+        type: 'info',
+        message: '取消删除',
+      })
+    })
+
+}
+
+async function shareVote(voteId: number) {
+  const url = `${window.location.origin}/#/vote/${voteId}`
+
+  try {
+    await navigator.clipboard.writeText(url)
+    ElMessage({
+      type: 'success',
+      message: '链接已复制到剪贴板！',
+    })
+  } catch (err) {
+    // 如果用户不允许访问剪贴板
+    console.error('复制失败:', err)
+    ElMessage({
+      type: 'error',
+      message: '复制失败，请手动复制',
+    })
+  }
+}
 
 </script>
