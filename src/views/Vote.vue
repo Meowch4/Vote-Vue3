@@ -10,9 +10,17 @@
     <div class="relative">
       <span
         class="cursor-pointer bg-blue-500 text-white rounded-full w-10 h-10 absolute top-0 right-4 p-4 flex justify-center items-center"
+        @click="showShare=true"
       >
-        <el-icon :size="24"><Share /></el-icon>
+        <el-icon :size="24">
+          <Share />
+        </el-icon>
       </span>
+      <ActionSheet 
+      v-model:show="showShare"
+      cancel-text="取消"
+      :actions="shareActions"
+      ></ActionSheet>
 
       <h2 class="ml-4 my-2 text-2xl font-bold">{{ voteInfo.vote.title }}</h2>
       <h3 class="my-2 py-1">
@@ -94,6 +102,8 @@ import { computed, onMounted, reactive, ref, watchEffect } from 'vue'
 import { useVoteStore } from '@/stores/vote'
 import { useWindowSize } from '@/hooks'
 import { useElementSize } from '@vueuse/core'
+import { showToast, ActionSheet, type ActionSheetAction } from 'vant'
+import copy from 'copy-to-clipboard'
 
 var route = useRoute()
 var id = route.params.id
@@ -101,6 +111,24 @@ var voteStore = useVoteStore()
 
 var res = await axios.get('/vote/' + id)
 var voteInfo = reactive(res.data.result)
+
+var showShare = ref(false)
+var shareActions = [{
+  name: '复制链接',
+  callback: function() {
+    copy(location.href)
+    showToast({
+      message: '复制成功',
+      position: 'top',
+    })
+  }
+}, {
+  name: '分享给好友'
+}, {
+  name: '分享到朋友圈'
+}
+
+]
 
 var iso = voteInfo.vote.deadline
 const localDate = new Date(iso).toLocaleString()
@@ -150,6 +178,7 @@ var isVotedByCurrentUser = computed(() => {
   return result
 })
 
+// 是否过了截止时间
 var pastDeadline = computed(() => {
   var d = new Date().toISOString()
   if (d > voteInfo.vote.deadline) {
