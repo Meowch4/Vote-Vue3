@@ -1,14 +1,15 @@
 <template>
   <div class="bg-gray-200 h-[100dvh] flex flex-col">
     <div class="bg-white pt-2 space-y-1">
-      <h1 class="font-bold text-xl p-4">
+      <!-- <h1 class="font-bold text-xl p-4">
         <RouterLink to="/">
           <el-icon class="relative top-px">
             <ArrowLeftBold></ArrowLeftBold>
           </el-icon>
         </RouterLink>
         创建{{ type }}投票
-      </h1>
+      </h1> -->
+      <NavBar :title="`创建${ type }投票`" left-arrow @click-left="router.push('/')"></NavBar>
 
       <div class="flex flex-col px-4">
         <input
@@ -111,6 +112,7 @@ import axios from 'axios'
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Popup, DatePicker, PickerGroup, TimePicker } from 'vant'
+import { NavBar } from 'vant';
 
 var router = useRouter()
 var route = useRoute()
@@ -143,7 +145,6 @@ async function create() {
     options: options.value,
   }
   var res = await axios.post('/vote', voteInfo)
-  console.log(res)
   if (res.data.code == 0) {
     var id = res.data.result.voteId
     router.push('/vote/' + id)

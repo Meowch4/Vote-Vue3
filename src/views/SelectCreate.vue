@@ -1,6 +1,8 @@
 <template>
   <div class="h-full bg-gray-100">
-    <h1 class="py-2 text-xl bg-gray-100 font-bold flex justify-center">腾讯投票</h1>
+    <!-- <h1 class="py-2 text-xl bg-gray-100 font-bold flex justify-center">腾讯投票</h1> -->
+    
+    <NavBar title="腾讯投票" backgroud="#f3f4f6"></NavBar>
 
     <div class="h-full space-y-4">
       <RouterLink
@@ -21,3 +23,7 @@
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { NavBar } from 'vant';
+</script>

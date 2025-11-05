@@ -30,7 +30,7 @@
         <div 
         class="bg-white shadow px-4 "
         :class="{
-          'hover:bg-blue-300 cursor-pointer': !pastDeadline,
+          // 'hover:bg-blue-300 cursor-pointer': !pastDeadline,
           'cursor-default opacity-70': pastDeadline
         }"
         @click="!pastDeadline && handleOptionClick(option.optionId)"
@@ -55,16 +55,17 @@
           </div>
         </div>
         <div 
-        v-if="!voteInfo.vote.anonymous && visibleAvatars(idx).length > 0"
+        v-if="!voteInfo.vote.anonymous"
         ref="avatarContainer"
         class="flex flex-wrap gap-2 px-4 pt-2 mt-2">
           <img
+            v-if="voteInfo.options && voteInfo.options.length > 0"
             class="inline-block align-top w-8 h-8 rounded-full border border-slate-500"
             v-for="user in visibleAvatars(idx)"
             :src="user.avatar"
-            alt=""
           />
           <el-icon 
+          v-show="visibleAvatars(idx).length > 1"
           class="cursor-pointer inline-block align-top !w-8 !h-8 rounded-full border border-slate-500"
           @click="eachOptionAvatarDisplay[idx]=true"
           ><More /></el-icon>
@@ -239,21 +240,19 @@ var lastVotedIndex = ref(-1) // 最后一次投票的id，用来显示loading
 function handleOptionClick(optionId: number) {
   // 非匿名，点击即发起请求
   if (!voteInfo.vote.anonymous) {
-    if (showCompleteButton.value) {
-      isVoting.value = true
-      lastVotedIndex.value = optionId
-  
-      axios
-        .post(`/vote/${voteInfo.vote.voteId}`, {
-          optionIds: [optionId],
-        })
-        .then((res) => {
-          // console.log(res.data.result)
-          isVoting.value = false
-          voteInfo.userVotes = res.data.result.userVotes
-        })
-    }
-  } else {
+    isVoting.value = true
+    lastVotedIndex.value = optionId
+
+    axios
+      .post(`/vote/${voteInfo.vote.voteId}`, {
+        optionIds: [optionId],
+      })
+      .then((res) => {
+        // console.log(res.data.result)
+        isVoting.value = false
+        voteInfo.userVotes = res.data.result.userVotes
+      })
+} else {
     if (showCompleteButton.value) {
       // 匿名投票点击只是选中该选项，点提交才发送请求，且不能再发送了
       if (selectedOptionId.value.includes(optionId)) {
