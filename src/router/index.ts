@@ -30,7 +30,7 @@ const router = createRouter({
     },
     {
       path: '/create',
-      component: () => import('../views/CreateVote.vue'),
+      component: () => import('../views/CreateVote.vue')
     },
     {
       path: '/vote/:id',
@@ -43,6 +43,10 @@ const router = createRouter({
     {
       path: '/my-settings',
       component: () => import('../views/MySettings.vue'),
+    },
+    {
+      path: '/register',
+      component: () => import('../views/Register.vue'),
     },
   ],
 })

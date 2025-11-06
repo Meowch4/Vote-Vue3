@@ -15,7 +15,7 @@ export const useVoteStore = defineStore('voteStore', () => {
     try {
       var userInfo = await axios.get('/account/current-user')
       user.value = userInfo.data.result
-    } catch (e) {
+    } catch (e: any) {
       if (e.isAxiosError) {
         console.log('user not login.')
       } else {

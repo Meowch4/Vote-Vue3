@@ -20,6 +20,7 @@ export default defineConfig({
         target: 'ws://localhost:5175',
         ws: true,
       },
+      '/upload': 'http://localhost:5175/',
     },
   },
   plugins: [vue(), vueDevTools()],
