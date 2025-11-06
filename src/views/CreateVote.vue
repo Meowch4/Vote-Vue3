@@ -83,12 +83,6 @@
             />
           </PickerGroup>
         </Popup>
-        <!-- <el-date-picker
-          format="YYYY-MM-DD HH:mm"
-          v-model="deadline"
-          type="datetime"
-          placeholder="请选择截止日期和时间"
-        /> -->
       </div>
       <div class="m-2 p-2 flex justify-between">
         匿名投票
