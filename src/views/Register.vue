@@ -1,9 +1,17 @@
 <template>
-  <div class="flex items-center h-12 border border-rounded"><input type="text" v-model="name" placeholder="用户名" /></div>
-  <div class="flex items-center h-12 border border-rounded"><input type="password" v-model="password" placeholder="密码" /></div>
-  <div class="flex items-center h-12 border border-rounded"><input type="text" v-model="email" placeholder="邮箱" /></div>
+  <div class="flex items-center h-12 border border-rounded">
+    <input type="text" v-model="name" placeholder="用户名" />
+  </div>
+  <div class="flex items-center h-12 border border-rounded">
+    <input type="password" v-model="password" placeholder="密码" />
+  </div>
+  <div class="flex items-center h-12 border border-rounded">
+    <input type="text" v-model="email" placeholder="邮箱" />
+  </div>
   <div class="flex items-center h-12 border border-rounded"><input type="file" ref="avatar" /></div>
-  <div class="flex items-center h-12 border border-rounded"><button @click="register" type="button" :disabled="!avatarUrl">注册</button></div>
+  <div class="flex items-center h-12 border border-rounded">
+    <button @click="register" type="button" :disabled="!avatarUrl">注册</button>
+  </div>
 </template>
 
 <script setup lang="ts">
