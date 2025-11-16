@@ -1,42 +1,53 @@
-# vote-vue3
+# Vote-Vue3 – 仿腾讯投票平台
 
-This template should help get you started developing with Vue 3 in Vite.
+============================
 
-## Recommended IDE Setup
+**项目简介**
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+一个基于 Vue3 + Vite + TypeScript 的投票应用，包含登录、投票创建、投票参与、结果展示等完整业务流程。项目以仿真实际线上投票产品为目标，从交互、逻辑到页面结构都贴合真实业务场景。
 
-## Recommended Browser Setup
+**🚀技术栈**
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd) 
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+* Vue3 Composition API
 
-## Type Support for `.vue` Imports in TS
+* Vite
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+* TypeScript
 
-## Customize configuration
+* Pinia / Vuex 
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+* Vue Router
 
-## Project Setup
+* Axios
 
-```sh
-pnpm install
-```
+* Tailwind / Vant
 
-### Compile and Hot-Reload for Development
+**🔥功能特性**
 
-```sh
-pnpm dev
-```
+* 用户登录 
 
-### Type-Check, Compile and Minify for Production
+* 创建投票（多选 / 单选 / 匿名 / 实名）
 
-```sh
-pnpm build
-```
+* 设置投票标题、描述
+
+* 参与投票
+
+* 投票票数占比动态展示
+
+* websocket链接实时更新投票结果
+
+* 投票列表展示，投票编辑/删除/分享功能
+
+**🧠亮点与技术实现**
+
+* 使用 Composition API 进行逻辑组织，更清晰的模块化代码结构
+
+* 使用 Pinia 管理全局状态，避免组件间数据传递混乱
+
+* 利用 cookie 实现简单的登录状态持久化
+
+* 使用 自定义 Hook（useLogin / useSelectOne / useWindowSize） 抽离业务逻辑，使组件高度复用
+
+* 投票进度展示使用动画过渡效果
+
+* 显示投票用户头像（非匿名投票）
