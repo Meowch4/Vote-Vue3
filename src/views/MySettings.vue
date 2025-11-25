@@ -11,14 +11,14 @@
   
   
       <div class="flex items-center justify-center gap-4 p-12">
-        <img class="w-20 h-20 rounded-full" src="https://www.dummyimage.com/600x400/6c6dc7/ffffff"></img>
+        <img class="w-20 h-20 rounded-full" :src="userInfo?.avatar"></img>
       </div>
       <RouterLink 
       to="/" 
       class="cursor-pointer relative px-4 bg-white h-20 flex items-center text-base">
         <span class="font-bold">昵称</span>
         <span class="flex items-center gap-2 ml-auto text-slate-400">
-          默认昵称
+          {{ userInfo?.name }}
           <el-icon><ArrowRightBold /></el-icon>
         </span>
       </RouterLink>
@@ -43,6 +43,7 @@ import { useLogin } from '@/hooks';
 var voteStore = useVoteStore()
 var route = useRoute()
 var router = useRouter()
+var userInfo = voteStore.user
 
 async function logout() {
   await axios.get('/account/logout')
