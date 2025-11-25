@@ -4,8 +4,8 @@
   <div class="bg-gray-100 min-h-full">
 
     <div class="flex items-center ml-16 py-8 gap-2">
-      <img class="w-20 h-20 rounded-full" :src="userInfo!.avatar"></img>
-      <span class="mx-8 text-xl font-bold">{{ userInfo!.name }}</span>
+      <img class="w-20 h-20 rounded-full" :src="userInfo?.avatar"></img>
+      <span class="mx-8 text-xl font-bold">{{ userInfo?.name }}</span>
     </div>
 
     <div class="bg-white flex flex-col  text-lg devide-y">
